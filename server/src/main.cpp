@@ -122,8 +122,8 @@ int main (int argc, char **argv)
 //	enable_logging_of (LOG_CLIENTSOCKET);		
 //	enable_logging_of (LOG_CONTROLLER);
 //	enable_logging_of (LOG_LOWERHCI);		
-	enable_logging_of (LOG_LINKLAYER);
-	enable_logging_of (LOG_LLSM);
+//	enable_logging_of (LOG_LINKLAYER);
+//	enable_logging_of (LOG_LLSM);
 //	enable_logging_of (LOG_PHYSICALLAYER);
 
 	time (&rawtime);

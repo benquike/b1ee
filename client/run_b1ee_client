@@ -1,0 +1,2 @@
+#!/bin/sh
+while (true) do python3.2 ./blecli.py -adv localhost ; sleep 1; done
