@@ -6,9 +6,9 @@ This project is designed to allow any Bluetooth low energy host platform to test
 
 ## Presentations
 
-A presentation given in Barcelona, October 2012
+A presentation given in Barcelona, October 2012, and Fort Worth, February 2013.
 
-<a href="/presentations/lowenergyclouds.pdf">![LowEnergyClouds](/presentations/lowenergyclouds.png)</a>
+<a href="/lowenergyclouds.pdf">![LowEnergyClouds](/lowenergyclouds.png)</a>
 
 ## Todo List
 
@@ -35,4 +35,4 @@ Sniffer Interface is documented [here](sniffer.html).
 
 ## Open Source
 
-The source code is available from a fossil server at [b1ee.com:8080](http://b1ee.com:8080/timeline). If you wish to help develop this, please contact robin at heydon dot org
+The source code is available from github at [https://github.com/robinheydon/b1ee](https://github.com/robinheydon/b1ee). If you wish to help develop this, please contact robin at heydon dot org
