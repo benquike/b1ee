@@ -1,0 +1,8 @@
+#!/bin/sh
+
+for f in `find *.md`;
+do
+	name=${f%\.*}
+	echo $f $name
+	pandoc -t html5 -s $f -o htdocs/${name}.html
+done
