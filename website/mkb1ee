@@ -1,4 +1,4 @@
 #!/bin/sh
 
 ./md2html
-rsync --progress -v htdocs/*.html b1ee.com:/var/www/html/b1ee.com/
+rsync --progress -v htdocs/*.html b1ee.com:/var/www/b1ee.com/www/

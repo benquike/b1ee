@@ -21,13 +21,13 @@ clean :
 
 b1ee : $(OBJS) $(DEPENDS)
 	@echo "Linking $@"
-	@c++ -o $@ $(OBJS)
+	@c++ -o $@ -pthread $(OBJS)
 	@echo "-------------------------------------------------------------------------------"
 
 
 $(OBJDIR)/%.o : $(SRCDIR)/%.cpp makefile
 	@echo "Compiling $<"
-	@c++ -g -Werror -c $< -o $@
+	@c++ -g -pthread -Werror -c $< -o $@
 
 
 $(OBJDIR)/%.d : $(SRCDIR)/%.cpp makefile
