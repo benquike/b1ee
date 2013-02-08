@@ -126,6 +126,7 @@ public:
 	void consume_read_buffer (int len);
 
 	void write_data (char *buffer, int len);
+	void close_when_written (void);
 
 	virtual char *get_name (void);
 
@@ -140,6 +141,8 @@ private:
 	int write_buffer_len;
 	int write_buffer_size;
 	char *write_buffer;
+
+	bool close_pending;
 
 };
 

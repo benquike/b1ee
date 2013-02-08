@@ -61,6 +61,8 @@ WebSocket::WebSocket (int new_sockfd, unsigned long new_addr, unsigned int new_p
 	write_buffer_size = 0;
 	write_buffer = 0;
 
+	close_pending = false;
+
 	log (LOG_WEBSOCKET, "WebSocket %s", get_name ());
 }
 
@@ -159,16 +161,6 @@ void WebSocket::on_readable (void)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void WebSocket::process_request (char *request)
-{
-	char *headers[maximum_number_of_request_headers];
-	char *ptr;
-
-
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 void WebSocket::on_writable (void)
 {
 	int err;
@@ -194,6 +186,13 @@ void WebSocket::on_writable (void)
 
 	memcpy (write_buffer, &write_buffer[err], write_buffer_size - err);
 	write_buffer_len -= err;
+
+	if ((close_pending) && (write_buffer_len == 0))
+	{
+		log (LOG_WEBSOCKET, "Deleting WebSocket");
+		set_delete_ready ();
+		set_delete_pending ();
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -238,6 +237,13 @@ void WebSocket::write_data (char *buffer, int len)
 	write_buffer_len += len;
 
 	write (ListenSocket::get_write_pipefd (), " ", 1);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void WebSocket::close_when_written (void)
+{
+	close_pending = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -406,14 +412,22 @@ void WebRequest::request_to_headers (void)
 void WebRequest::process (void)
 {
 	int index;
+	static int count = 0;
+	char buffer[100];
 
-	
+
 	log (LOG_WEBSOCKET, "Process: %s, %s, %s", method, url, protocol);
 
 	for (index = 0; index < number_of_headers; index ++)
 	{
 		log (LOG_WEBSOCKET, "   %-12s = %s", header_keys[index], header_values[index]);
 	}
+
+	sprintf (buffer, "HTTP/1.1 200 OK\r\n\r\nCount = %d\n", count);
+	count += 1;
+
+	socket->write_data (buffer, strlen (buffer));
+	socket->close_when_written ();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
