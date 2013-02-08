@@ -73,7 +73,6 @@ private:
 
 };
 
-
 ////////////////////////////////////////////////////////////////////////////////
 
 class ClientSocket : public Socket
@@ -105,6 +104,75 @@ private:
 	int write_buffer_len;
 	int write_buffer_size;
 	char *write_buffer;
+
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+class WebSocket : public Socket
+{
+public:
+
+	WebSocket (int client_sockfd, unsigned long addr, unsigned int port);
+	virtual ~WebSocket ();
+
+	bool is_readable (void);
+	bool is_writable (void);
+
+	virtual void on_readable (void);
+	virtual void on_writable (void);
+
+	char *peek_read_buffer (int *len);
+	void consume_read_buffer (int len);
+
+	void write_data (char *buffer, int len);
+
+	virtual char *get_name (void);
+
+private:
+
+	void process_request (char *request);
+
+	int read_buffer_len;	// length of the valid data in the read_buffer
+	int read_buffer_size;	// how big is the read_buffer
+	char *read_buffer;		// the read_buffer itself
+
+	int write_buffer_len;
+	int write_buffer_size;
+	char *write_buffer;
+
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+const int maximum_number_of_request_headers = 64;
+
+////////////////////////////////////////////////////////////////////////////////
+
+class WebRequest
+{
+public:
+
+	WebRequest (WebSocket *respond_to, char *request);
+	~WebRequest ();
+
+	void process (void);
+
+private:
+
+	void request_to_headers (void);
+
+	WebSocket *socket;
+
+	char *request;
+
+	char *method;
+	char *url;
+	char *protocol;
+
+	int number_of_headers;
+	char *header_keys[maximum_number_of_request_headers];
+	char *header_values[maximum_number_of_request_headers];
 
 };
 

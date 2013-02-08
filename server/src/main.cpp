@@ -96,7 +96,7 @@ void start_background_monitor (void *arg)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void on_connection (int sockfd, unsigned long addr, unsigned int port)
+void on_hci_connection (int sockfd, unsigned long addr, unsigned int port)
 {
 	Controller *controller;
 
@@ -106,9 +106,19 @@ void on_connection (int sockfd, unsigned long addr, unsigned int port)
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void on_web_connection (int sockfd, unsigned long addr, unsigned int port)
+{
+	WebSocket *web;
+
+	web = new WebSocket (sockfd, addr, port);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 int main (int argc, char **argv)
 {
-	ListenSocket *listen;
+	ListenSocket *hci_listen;
+	ListenSocket *web_listen;
 	time_t rawtime;
 	struct tm *timeinfo;
 	char *timestr;
@@ -118,12 +128,13 @@ int main (int argc, char **argv)
 	enable_logging_of (LOG_WARNING);
 	enable_logging_of (LOG_ERROR);
 //	enable_logging_of (LOG_SOCKET);
+	enable_logging_of (LOG_WEBSOCKET);
 //	enable_logging_of (LOG_LISTENSOCKET);
 //	enable_logging_of (LOG_CLIENTSOCKET);		
 //	enable_logging_of (LOG_CONTROLLER);
 //	enable_logging_of (LOG_LOWERHCI);		
-	enable_logging_of (LOG_LINKLAYER);
-	enable_logging_of (LOG_LLSM);
+//	enable_logging_of (LOG_LINKLAYER);
+//	enable_logging_of (LOG_LLSM);
 //	enable_logging_of (LOG_PHYSICALLAYER);
 
 	time (&rawtime);
@@ -139,8 +150,11 @@ int main (int argc, char **argv)
 	start_background_monitor ((void *) argv[0]);
 	start_physical_layer_simulation ();
 
-	listen = new ListenSocket (0xb1ee);
-	listen->set_callback (on_connection);
+	hci_listen = new ListenSocket (0xb1ee);
+	hci_listen->set_callback (on_hci_connection);
+
+	web_listen = new ListenSocket (0xb1ed);
+	web_listen->set_callback (on_web_connection);
 	
 	while (Socket::poll ())
 	{

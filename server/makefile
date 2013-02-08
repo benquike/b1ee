@@ -6,8 +6,10 @@ SRCDIR := src
 
 
 OBJS := $(addprefix $(OBJDIR)/,\
-   main.o log.o socket.o controller.o lowerhci.o linklayer.o \
-   llsm.o llsm_adv.o llsm_scan.o \
+   main.o log.o \
+	socket.o listen_socket.o client_socket.o web_socket.o \
+	controller.o lowerhci.o \
+	linklayer.o llsm.o llsm_adv.o llsm_scan.o \
    phylayer.o )
 
 
