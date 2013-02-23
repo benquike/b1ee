@@ -38,7 +38,7 @@ const int maximum_advertising_data_length = 31;
 const int maximum_scan_response_data_length = 31;
 const int maximum_features_page_number = 4;
 const int maximum_number_of_white_list_entries = 1;
-const int maximum_number_of_link_layer_state_machines = 1;
+const int maximum_number_of_link_layer_state_machines = 2;
 const uint32 advertising_access_address = 0x8E89BED6;
 
 ////////////////////////////////////////////////////////////////////////////////

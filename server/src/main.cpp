@@ -27,6 +27,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <pthread.h>
@@ -38,6 +40,10 @@
 #include "controller.h"
 #include "socket.h"
 #include "log.h"
+
+////////////////////////////////////////////////////////////////////////////////
+
+static time_t program_start_time;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -115,14 +121,77 @@ void on_web_connection (int sockfd, unsigned long addr, unsigned int port)
 
 ////////////////////////////////////////////////////////////////////////////////
 
+bool server_uptime (WebRequest *req)
+{
+	char buffer[100];
+	time_t now;
+	long uptime;
+	
+
+	time (&now);
+	uptime = now - program_start_time;
+
+	req->add_response_part ("page_right", "Uptime = ${uptime}");
+	req->add_response_part ("page_left", "");
+
+	sprintf (buffer, "${page_layout}");
+
+	req->set_response_code (200);
+	req->add_template_response (buffer, strlen (buffer));
+
+	return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+const char *part_uptime (WebRequest *req)
+{
+	static char buffer[100];
+	time_t now;
+	long uptime;
+	long seconds;
+	long minutes;
+	long hours;
+	long days;
+	
+
+	time (&now);
+	uptime = now - program_start_time;
+
+	seconds = uptime % 60;
+	uptime = (uptime - seconds) / 60;
+	minutes = uptime % 60;
+	uptime = (uptime - minutes) / 60;
+	hours = uptime % 24;
+	uptime = (uptime - hours) / 24;
+	days = uptime;
+
+	sprintf (buffer, "%ld days %02ld:%02ld:%02ld", days, hours, minutes, seconds);
+
+	return buffer;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+const char *part_hit_count (WebRequest *req)
+{
+	static int count = 0;
+	static char buffer[20];
+
+	sprintf (buffer, "%d", count);
+	count += 1;
+
+	return buffer;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 int main (int argc, char **argv)
 {
 	ListenSocket *hci_listen;
 	ListenSocket *web_listen;
-	time_t rawtime;
 	struct tm *timeinfo;
 	char *timestr;
-
 
 	enable_logging_of (LOG_INFO);
 	enable_logging_of (LOG_WARNING);
@@ -137,16 +206,20 @@ int main (int argc, char **argv)
 //	enable_logging_of (LOG_LLSM);
 //	enable_logging_of (LOG_PHYSICALLAYER);
 
-	time (&rawtime);
-	srand (rawtime);
-	timeinfo = localtime (&rawtime);
+	time (&program_start_time);
+	srand (program_start_time);
+	timeinfo = localtime (&program_start_time);
 	timestr = asctime (timeinfo);
 	timestr[24] = 0;
 
 	log (LOG_INFO, "-----------------------------------------------------------------------------");
 	log (LOG_INFO, "%s%s", "Bluetooth Low Energy Virtual Controller Server @ ", timestr);
 	log (LOG_INFO, "-----------------------------------------------------------------------------");
-	
+
+	WebRequest::register_page ("/server/uptime", server_uptime);
+	WebRequest::register_part ("hit_count", part_hit_count);
+	WebRequest::register_part ("uptime", part_uptime);
+
 	start_background_monitor ((void *) argv[0]);
 	start_physical_layer_simulation ();
 
