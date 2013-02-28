@@ -184,7 +184,7 @@ private:
 	bool (*callback_func)(WebRequest *);
 	char *filename;
 
-	struct timespec last_modified;
+	time_t last_modified;
 	int html_len;
 	char *html_file;
 
@@ -216,7 +216,7 @@ private:
 	const char *read_file (WebRequest *);
 
 	char *filename;
-	struct timespec last_modified;
+	time_t last_modified;
 
 	static WebPart *all_webparts;
 

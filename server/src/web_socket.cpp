@@ -300,7 +300,7 @@ WebPage::WebPage (const char *page_path, char *page_filename, FILE *fp)
 
 	stat (filename, &file_stat);
 
-	last_modified = file_stat.st_mtimespec;
+	last_modified = file_stat.st_mtime;
 
 	fseeko (fp, 0, SEEK_END);
 	html_len = ftello (fp);
@@ -393,9 +393,9 @@ bool WebPage::process (WebRequest *req)
 			log (LOG_ERROR, "stat %s (%d : %s)", filename, errno, strerror (errno));
 		}
 
-		if ((file_stat.st_mtimespec.tv_sec != last_modified.tv_sec) || (file_stat.st_mtimespec.tv_nsec != last_modified.tv_nsec))
+		if (file_stat.st_mtime != last_modified)
 		{
-			last_modified = file_stat.st_mtimespec;
+			last_modified = file_stat.st_mtime;
 
 			free (html_file);
 			html_file = 0;
@@ -477,7 +477,7 @@ WebPart::WebPart (const char *part_name, const char *part_filename, FILE *fp)
 	filename = strdup (part_filename);
 
 	stat (filename, &file_stat);
-	last_modified = file_stat.st_mtimespec;
+	last_modified = file_stat.st_mtime;
 
 	fseeko (fp, 0, SEEK_END);
 	part_len = ftello (fp);
@@ -507,9 +507,9 @@ const char *WebPart::read_file (WebRequest *req)
 		log (LOG_ERROR, "stat %s (%d : %s)", filename, errno, strerror (errno));
 	}
 
-	if ((file_stat.st_mtimespec.tv_sec != last_modified.tv_sec) || (file_stat.st_mtimespec.tv_nsec != last_modified.tv_nsec))
+	if (file_stat.st_mtime != last_modified)
 	{
-		last_modified = file_stat.st_mtimespec;
+		last_modified = file_stat.st_mtime;
 
 		free (content);
 		content = 0;
