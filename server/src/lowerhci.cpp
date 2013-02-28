@@ -64,9 +64,6 @@ void LowerHCI::reset (void)
 	hci_le_acl_data_packet_length = 27;
 	hci_total_num_le_acl_data_packets = 4;
 
-	hci_le_acl_data_packet_length = 0;
-	hci_total_num_le_acl_data_packets = 0;
-
 	hci_acl_data_packet_length = 0;
 	hci_acl_data_packet_length = 0;
 	hci_synchronous_data_packet_length = 0;
@@ -74,7 +71,33 @@ void LowerHCI::reset (void)
 	hci_total_num_acl_data_packets = 0;
 	hci_total_num_synchronous_data_packets = 0;
 	hci_total_num_synchronous_data_packets = 0;
-}
+
+	memset (hci_supported_commands, 0, sizeof (hci_supported_commands));
+
+	hci_supported_commands[5] |= (1 << 6); // Set Event Mask
+	hci_supported_commands[5] |= (1 << 7); // Reset
+	hci_supported_commands[14] |= (1 << 3); // Read Local Version Information
+	hci_supported_commands[14] |= (1 << 5); // Read Local Supported Features
+	hci_supported_commands[14] |= (1 << 6); // Read Local Extended Features
+	hci_supported_commands[14] |= (1 << 7); // Read Buffer Size
+	hci_supported_commands[15] |= (1 << 1); // Read BD_ADDR
+	hci_supported_commands[24] |= (1 << 5); // Read LE Host Supported
+	hci_supported_commands[24] |= (1 << 6); // Write LE Host Supported
+	hci_supported_commands[25] |= (1 << 0); // LE Set Event Mask
+	hci_supported_commands[25] |= (1 << 1); // LE Read Buffer Size
+	hci_supported_commands[25] |= (1 << 2); // LE Read Local Supported Features
+	hci_supported_commands[25] |= (1 << 4); // LE Set Random Address
+	hci_supported_commands[25] |= (1 << 5); // LE Set Advertising Parameters
+	hci_supported_commands[25] |= (1 << 6); // LE Read Advertising Channel Tx Power
+	hci_supported_commands[25] |= (1 << 7); // LE Set Advertising Data
+	hci_supported_commands[26] |= (1 << 0); // LE Set Scan Response Data
+	hci_supported_commands[26] |= (1 << 1); // LE Set Advertising Enable
+	hci_supported_commands[26] |= (1 << 2); // LE Set Scan Parameters
+	hci_supported_commands[26] |= (1 << 3); // LE Set Scan Enable
+	hci_supported_commands[26] |= (1 << 4); // LE Create Connection
+	hci_supported_commands[26] |= (1 << 5); // LE Create Connection Cancel
+
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -194,7 +217,7 @@ void LowerHCI::hci_read_local_supported_commands_command (int parameter_len, cha
 	log (LOG_LOWERHCI, "HCI Read Local Supported Commands Command");
 
 	buffer[0] = EC_SUCCESS;
-	memset (&buffer[1], 0, 64);
+	memcpy (&buffer[1], hci_supported_commands, 64);
 
 	send_command_complete_event (HCI_READ_LOCAL_SUPPORTED_COMMANDS_COMMAND, 65, buffer);
 }
@@ -780,14 +803,19 @@ uint8 LowerHCI::hci_get_version (void)
 
 uint16 LowerHCI::hci_get_revision (void)
 {
-	return 0x0000;
+	long t;
+
+
+	t = get_program_start_time ();
+
+	return (t >> 4) & 0xFFFF;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 uint16 LowerHCI::hci_get_manufacturer (void)
 {
-	return 0x0000;
+	return 0xFFFF;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

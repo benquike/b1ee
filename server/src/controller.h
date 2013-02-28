@@ -347,6 +347,8 @@ private:
 	uint64 hci_event_mask;
 	uint64 hci_le_event_mask;
 
+	uint8 hci_supported_commands[64];
+
 	int hci_le_acl_data_packet_length;
 	int hci_total_num_le_acl_data_packets;
 
@@ -377,5 +379,9 @@ public:
 	virtual bool is_delete_pending (void);
 
 };
+
+////////////////////////////////////////////////////////////////////////////////
+
+extern long get_program_start_time (void);
 
 ////////////////////////////////////////////////////////////////////////////////

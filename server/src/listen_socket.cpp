@@ -76,7 +76,7 @@ ListenSocket::ListenSocket (int listen_port)
 	
 	if (bind (sockfd, (struct sockaddr *) &sock_addr, sizeof (sock_addr)) < 0)
 	{
-		log (LOG_ERROR, "on binding (%d : %s)", errno, strerror (errno));
+		log (LOG_ERROR, "Listen socket %d on binding (%d : %s)", port, errno, strerror (errno));
 		exit (1);
 	}
 
