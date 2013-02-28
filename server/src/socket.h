@@ -32,6 +32,11 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <stdio.h>
+#include <sys/stat.h>
+
+////////////////////////////////////////////////////////////////////////////////
+
 class Socket
 {
 public:
@@ -73,7 +78,6 @@ private:
 
 };
 
-
 ////////////////////////////////////////////////////////////////////////////////
 
 class ClientSocket : public Socket
@@ -105,6 +109,175 @@ private:
 	int write_buffer_len;
 	int write_buffer_size;
 	char *write_buffer;
+
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+class WebSocket : public Socket
+{
+public:
+
+	WebSocket (int client_sockfd, unsigned long addr, unsigned int port);
+	virtual ~WebSocket ();
+
+	bool is_readable (void);
+	bool is_writable (void);
+
+	virtual void on_readable (void);
+	virtual void on_writable (void);
+
+	char *peek_read_buffer (int *len);
+	void consume_read_buffer (int len);
+
+	void write_data (const char *buffer, int len);
+	void write_string (const char *buffer);
+	void close_when_written (void);
+
+	virtual char *get_name (void);
+
+private:
+
+	void process_request (char *request);
+
+	int read_buffer_len;	// length of the valid data in the read_buffer
+	int read_buffer_size;	// how big is the read_buffer
+	char *read_buffer;		// the read_buffer itself
+
+	int write_buffer_len;
+	int write_buffer_size;
+	char *write_buffer;
+
+	bool close_pending;
+
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+const int maximum_number_of_request_headers = 64;
+const int maximum_number_of_request_arguments = 64;
+const int maximum_number_of_request_parts = 64;
+
+////////////////////////////////////////////////////////////////////////////////
+
+class WebRequest;
+
+////////////////////////////////////////////////////////////////////////////////
+
+class WebPage
+{
+public:
+
+	WebPage (const char *path, char *filename, FILE *fp);
+	WebPage (const char *path, bool (*callback_func)(WebRequest *));
+	~WebPage ();
+
+	static WebPage *find (const char *path);
+
+	static WebPage *open (const char *path);
+
+	bool process (WebRequest *);
+
+private:
+
+	const char *path;
+	bool (*callback_func)(WebRequest *);
+	char *filename;
+
+	struct timespec last_modified;
+	int html_len;
+	char *html_file;
+
+	static WebPage *all_webpages;
+
+	WebPage *succ;
+
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+class WebPart
+{
+public:
+
+	WebPart (const char *name, const char *content);
+	WebPart (const char *name, const char *filename, FILE *fp);
+	WebPart (const char *name, const char *(*func)(WebRequest *));
+	~WebPart ();
+
+	static const char *get (const char *name, WebRequest *req);
+
+private:
+
+	const char *name;
+	char *content;
+	const char *(*callback_func)(WebRequest *);
+
+	const char *read_file (WebRequest *);
+
+	char *filename;
+	struct timespec last_modified;
+
+	static WebPart *all_webparts;
+
+	WebPart *succ;
+
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+class WebRequest
+{
+public:
+
+	WebRequest (WebSocket *respond_to, char *request);
+	~WebRequest ();
+
+	void process (void);
+
+	static void register_page (const char *url, bool (*callback_func)(WebRequest *));
+	static void register_part (const char *name, const char *content);
+	static void register_part (const char *name, const char *(*callback_func)(WebRequest *));
+
+	void set_response_code (int);
+	void add_header (const char *buffer);
+	void add_response (const char *buffer, int len);
+	void add_template_response (const char *buffer, int len);
+	void add_response_part (const char *name, const char *content);
+	void end_response (void);
+
+private:
+
+	void request_to_headers (void);
+	void add_response_code (void);
+
+	WebSocket *socket;
+
+	char *request;
+
+	int response_code;
+	char *headers;
+	int headers_len;
+	char *response;
+	int response_len;
+
+	bool keep_alive;
+
+	char *method;
+	char *path;
+	char *protocol;
+
+	int number_of_arguments;
+	char *argument_key[maximum_number_of_request_arguments];
+	char *argument_value[maximum_number_of_request_arguments];
+
+	int number_of_headers;
+	char *header_key[maximum_number_of_request_headers];
+	char *header_value[maximum_number_of_request_headers];
+
+	int number_of_parts;
+	char *part_key[maximum_number_of_request_parts];
+	char *part_value[maximum_number_of_request_parts];
 
 };
 

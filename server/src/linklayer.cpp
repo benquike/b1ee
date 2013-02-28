@@ -64,8 +64,10 @@ void LinkLayer::reset (void)
 		lmp_features[index] = 0x00000000000000000000000000000000;
 	}
 
+	lmp_features[0] = 0x00000000000000008000006000000000;
+
 	le_features = 0x00000000000000000000000000000000;
-	ll_supported_states = 0x00000000000000000000000000000000;
+	ll_supported_states = 0x00000000000000000000000000000037;
 
 	ll_advertising_interval_min = 0x0800;
 	ll_advertising_interval_max = 0x0800;
@@ -123,7 +125,12 @@ uint8 LinkLayer::ll_get_version (void)
 
 uint16 LinkLayer::ll_get_subversion (void)
 {
-	return 0x0000;
+	long t;
+
+
+	t = get_program_start_time ();
+
+	return t & 0xFFFF;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

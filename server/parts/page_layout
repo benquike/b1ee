@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>B1EE Server</title>
+	</head>
+	<body>
+		<div id="top">${page_top}</div>
+		<div id="navigation">
+${page_navigation}
+		</div>
+		<hr>
+		<div id="left">
+${page_left}
+		</div>
+		<div id="right">
+${page_right}
+		</div>
+		<div id="bottom">
+${page_bottom}
+		</div>
+	</body>
+</html>

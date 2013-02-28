@@ -107,6 +107,7 @@ const char *log_type_string (DebugLog val)
 		case LOG_WARNING:        log_type = "Warning : "; break;
 		case LOG_ERROR:          log_type = "ERROR * : "; break;
 		case LOG_SOCKET:         log_type = "Socket  : "; break;
+		case LOG_WEBSOCKET:      log_type = "WebSock : "; break;
 		case LOG_CLIENTSOCKET:   log_type = "Client  : "; break;
 		case LOG_LISTENSOCKET:   log_type = "Listen  : "; break;
 		case LOG_CONTROLLER:     log_type = "cntr    : "; break;
